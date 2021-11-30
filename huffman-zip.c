@@ -80,17 +80,19 @@ int main(int argc, char *argv[]) {
 	FreqTree *l2 = makeFreqTreeLeaf('u');
 	FreqTree *l3 = makeFreqTreeLeaf('c');
 	FreqTree *l4 = makeFreqTreeLeaf('k');
+	FreqTree *l5 = makeFreqTreeLeaf('!');
 
 	FreqTree *n1 = makeFreqTreeNode(l3, l4);
-	FreqTree *n2 = makeFreqTreeNode(l2, n1);
-	FreqTree *n3 = makeFreqTreeNode(l1, n2);
+	FreqTree *n2 = makeFreqTreeNode(n1, l5);
+	FreqTree *n3 = makeFreqTreeNode(l1, l2);
+	FreqTree *n4 = makeFreqTreeNode(n3, n2);
 	
-	unsigned char *treeStructure = makeTreeStructure(n3, 7);
+	unsigned char *treeStructure = makeTreeStructure(n4, 9);
 
-	for(int i = 0; i <= 7/8; i++) {
+	for(int i = 0; i <= 9/8; i++) {
 		printf("%x\n", treeStructure[i]);
 	}
 
 	free(treeStructure);
-	cleanFreqTree(n3);
+	cleanFreqTree(n4);
 }
