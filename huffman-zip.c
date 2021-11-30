@@ -77,6 +77,24 @@ unsigned char *makeTreeStructure(FreqTree *tree, int count, FILE *file) {
 	return treeStructure;
 }
 
+void compressFreqTreeToFile(FreqTree *tree, int count, FILE *file) {
+	// Magic number
+	fputs("HZ", file);
+
+	int structureLen = count/8 + 1;
+
+	fseek(file, structureLen, SEEK_CUR);
+
+	unsigned char *treeStructure = makeTreeStructure(tree, count, file);
+
+	// Go back and write the missing bytes
+	fseek(file, 2, SEEK_SET);
+	
+	fwrite(treeStructure, sizeof(char), structureLen, file);
+
+	free(treeStructure);
+}
+
 int main(int argc, char *argv[]) {
 	FreqTree *l1 = makeFreqTreeLeaf('f');
 	FreqTree *l2 = makeFreqTreeLeaf('u');
@@ -91,13 +109,9 @@ int main(int argc, char *argv[]) {
 
 	FILE *file = fopen("a.hz", "w");
 	
-	unsigned char *treeStructure = makeTreeStructure(n4, 9, file);
-
-	for(int i = 0; i <= 9/8; i++) {
-		printf("%x\n", treeStructure[i]);
-	}
+	compressFreqTreeToFile(n4, 9, file);
 
 	fclose(file);
-	free(treeStructure);
+
 	cleanFreqTree(n4);
 }
