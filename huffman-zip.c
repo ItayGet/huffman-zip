@@ -44,9 +44,11 @@ void cleanFreqTree(FreqTree *tree) {
 }
 
 
-void populateTreeStructure(FreqTree *tree, unsigned char **treeStructure, unsigned char *offset) {
+void populateTreeStructure(FreqTree *tree, unsigned char **treeStructure, unsigned char *offset, FILE *file) {
 	if(!isLeaf(tree)) {
 		**treeStructure |= 1 << *offset;
+	} else {
+		putc(tree->data, file);
 	}
 
 	// Check if current item is full
@@ -58,19 +60,19 @@ void populateTreeStructure(FreqTree *tree, unsigned char **treeStructure, unsign
 	}
 
 	if(!isLeaf(tree)) {
-		populateTreeStructure(tree->lhs, treeStructure, offset);
-		populateTreeStructure(tree->rhs, treeStructure, offset);
+		populateTreeStructure(tree->lhs, treeStructure, offset, file);
+		populateTreeStructure(tree->rhs, treeStructure, offset, file);
 	}
 }
 
-unsigned char *makeTreeStructure(FreqTree *tree, int count) {
+unsigned char *makeTreeStructure(FreqTree *tree, int count, FILE *file) {
 	// bitfield for the structure of the tree
 	unsigned char *treeStructure = malloc(sizeof(unsigned char) * count/8);
 
 	unsigned char offset = 0, *treeStructurePtr = treeStructure;
 
 	// FIXME: Possible buffer overflow
-	populateTreeStructure(tree, &treeStructurePtr, &offset);
+	populateTreeStructure(tree, &treeStructurePtr, &offset, file);
 
 	return treeStructure;
 }
@@ -86,13 +88,16 @@ int main(int argc, char *argv[]) {
 	FreqTree *n2 = makeFreqTreeNode(n1, l5);
 	FreqTree *n3 = makeFreqTreeNode(l1, l2);
 	FreqTree *n4 = makeFreqTreeNode(n3, n2);
+
+	FILE *file = fopen("a.hz", "w");
 	
-	unsigned char *treeStructure = makeTreeStructure(n4, 9);
+	unsigned char *treeStructure = makeTreeStructure(n4, 9, file);
 
 	for(int i = 0; i <= 9/8; i++) {
 		printf("%x\n", treeStructure[i]);
 	}
 
+	fclose(file);
 	free(treeStructure);
 	cleanFreqTree(n4);
 }
