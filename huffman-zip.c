@@ -17,6 +17,30 @@ typedef struct FreqTree {
 
 #define isLeaf(t) ((t)->lhs==NULL)
 
+FreqTree *makeFreqTreeLeaf(char data) {
+	FreqTree *node = malloc(sizeof(FreqTree));
+	node->lhs = NULL;
+	node->data = data;
+
+	return node;
+}
+
+FreqTree *makeFreqTreeNode(FreqTree *lhs, FreqTree *rhs) {
+	FreqTree *node = malloc(sizeof(FreqTree));
+	node->lhs = lhs;
+	node->rhs = rhs;
+
+	return node;
+}
+
+void cleanFreqTree(FreqTree *tree) {
+	if(!isLeaf(tree)) {
+		cleanFreqTree(tree->lhs);
+		cleanFreqTree(tree->rhs);
+	}
+
+	free(tree);
+}
 
 int main(int argc, char *argv[]) {
 }
