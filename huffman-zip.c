@@ -13,7 +13,6 @@ typedef struct FreqTree {
 		struct FreqTree *rhs;
 		char data;
 	};
-
 } FreqTree;
 
 #define isLeaf(t) ((t)->lhs==NULL)
@@ -43,7 +42,8 @@ void cleanFreqTree(FreqTree *tree) {
 	free(tree);
 }
 
-
+// Walks preorder in the tree structure, builds up structure bits of the tree
+// and writes data to file as per specification
 void populateTreeStructure(FreqTree *tree, unsigned char **treeStructure, unsigned char *offset, FILE *file) {
 	if(!isLeaf(tree)) {
 		**treeStructure |= 1 << *offset;
@@ -65,8 +65,8 @@ void populateTreeStructure(FreqTree *tree, unsigned char **treeStructure, unsign
 	}
 }
 
+// Prepare calling for populateTreeStructure
 unsigned char *makeTreeStructure(FreqTree *tree, int count, FILE *file) {
-	// bitfield for the structure of the tree
 	unsigned char *treeStructure = malloc(sizeof(unsigned char) * count/8);
 
 	unsigned char offset = 0, *treeStructurePtr = treeStructure;
@@ -77,7 +77,9 @@ unsigned char *makeTreeStructure(FreqTree *tree, int count, FILE *file) {
 	return treeStructure;
 }
 
-void compressFreqTreeToFile(FreqTree *tree, int count, FILE *file) {
+// Write any necessary metadata to file
+// Handles writing structure bits to file and calling populateTreeStructure
+void writeMetadataToFile(FreqTree *tree, int count, FILE *file) {
 	// Magic number
 	fputs("HZ", file);
 
@@ -109,7 +111,7 @@ int main(int argc, char *argv[]) {
 
 	FILE *file = fopen("a.hz", "w");
 	
-	compressFreqTreeToFile(n4, 9, file);
+	writeMetadataToFile(n4, 9, file);
 
 	fclose(file);
 
