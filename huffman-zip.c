@@ -42,6 +42,76 @@ void cleanFreqTree(FreqTree *tree) {
 	free(tree);
 }
 
+typedef struct {
+	// Length in bits
+	int length;
+
+	// Malloc'ed
+	char *bits;
+} BitList;
+
+void cleanBitsList(BitList *bl) {
+	free(bl->bits);
+}
+
+#define BUCKETS 8
+
+#define HASH(key) ((key)%BUCKETS)
+
+typedef struct EncMapEntry {
+	unsigned char key;
+	BitList value;
+	struct EncMapEntry *next;
+} EncMapEntry;
+
+// Hash map that is converted from a FreqTree in order to encode but not to
+// decode
+typedef struct {
+	EncMapEntry *entries[BUCKETS];
+} EncMap;
+
+void makeSymbolTable(EncMap *em) {
+	for(int i = 0; i < BUCKETS; i++) {
+		em->entries[i] = NULL;
+	}
+}
+
+void cleanEncMapEntry(EncMapEntry *eme) {
+	if(!eme) { return; }
+
+	cleanEncMapEntry(eme->next);
+	cleanBitsList(&eme->value);
+	free(eme);
+}
+
+void cleanEncMap(EncMap *em) {
+	for(int i = 0; i < BUCKETS; i++) {
+		cleanEncMapEntry(em->entries[i]);
+	}
+}
+
+void insertEntryEncMap(EncMap *map, char key, BitList *value) {
+	int hash = HASH(key);
+
+	EncMapEntry *newEntry = malloc(sizeof(EncMapEntry)),
+		    *prevEntry = map->entries[hash];
+	map->entries[hash] = newEntry;
+	newEntry->next = prevEntry;
+	
+	newEntry->key = key;
+	newEntry->value = *value;
+}
+
+BitList *getEntryEncMap(EncMap *map, char key) {
+	for(EncMapEntry *eme = map->entries[HASH(key)]; eme; eme = eme->next) {
+		if(eme->key == key) {
+			return &eme->value;
+		}
+	}
+
+	return NULL;
+}
+
 // Walks preorder in the tree structure, builds up structure bits of the tree
 // and writes data to file as per specification
 void populateTreeStructure(FreqTree *tree, unsigned char **treeStructure, unsigned char *offset, FILE *file) {
