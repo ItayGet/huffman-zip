@@ -46,13 +46,8 @@ typedef struct {
 	// Length in bits
 	int length;
 
-	// Malloc'ed
-	char *bits;
-} BitList;
-
-void cleanBitsList(BitList *bl) {
-	free(bl->bits);
-}
+	unsigned long int bits;
+} BitField;
 
 #define BUCKETS 8
 
@@ -60,7 +55,7 @@ void cleanBitsList(BitList *bl) {
 
 typedef struct EncMapEntry {
 	unsigned char key;
-	BitList value;
+	BitField value;
 	struct EncMapEntry *next;
 } EncMapEntry;
 
@@ -80,7 +75,6 @@ void cleanEncMapEntry(EncMapEntry *eme) {
 	if(!eme) { return; }
 
 	cleanEncMapEntry(eme->next);
-	cleanBitsList(&eme->value);
 	free(eme);
 }
 
@@ -90,7 +84,7 @@ void cleanEncMap(EncMap *em) {
 	}
 }
 
-void insertEntryEncMap(EncMap *map, char key, BitList *value) {
+void insertEntryEncMap(EncMap *map, char key, BitField *value) {
 	int hash = HASH(key);
 
 	EncMapEntry *newEntry = malloc(sizeof(EncMapEntry)),
@@ -102,7 +96,7 @@ void insertEntryEncMap(EncMap *map, char key, BitList *value) {
 	newEntry->value = *value;
 }
 
-BitList *getEntryEncMap(EncMap *map, char key) {
+BitField *getEntryEncMap(EncMap *map, char key) {
 	for(EncMapEntry *eme = map->entries[HASH(key)]; eme; eme = eme->next) {
 		if(eme->key == key) {
 			return &eme->value;
