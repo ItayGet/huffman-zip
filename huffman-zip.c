@@ -114,6 +114,63 @@ BitField *getEntryEncMap(EncMap *map, char key) {
 	return NULL;
 }
 
+// A file with a buffer that enables to write bitfields into files without padding
+// After finishing writing to file use the closeBitFieldFile to finish writing the file
+typedef struct {
+	unsigned char buffer;
+
+	// In bits
+	unsigned char bufferLength;
+
+	FILE *file;
+} BitFieldFile;
+
+void makeBitFieldFile(BitFieldFile *bff, FILE *file) {
+	bff->bufferLength = 0;
+
+	bff->file = file;
+}
+
+void closeBitFieldFile(BitFieldFile *bff) {
+	putc(bff->buffer, bff->file);
+}
+
+void writeBitField(BitFieldFile *bff, BitField bf) {
+	// Complete bits inside current buffer
+	if(bff->bufferLength > 0) {
+		bff->buffer += bf.bits << bff->bufferLength;
+
+		int addedBits;
+		if(CHAR_BIT - bff->bufferLength < bf.length) {
+			addedBits = CHAR_BIT - bff->bufferLength;
+		} else { 
+			addedBits = bf.length;
+		}
+
+		bff->bufferLength += addedBits;
+		bf.length -= addedBits;
+		bf.bits >>= addedBits;
+
+		if(bff->bufferLength == CHAR_BIT) {
+			putc(bff->buffer, bff->file);
+			bff->bufferLength = 0;
+		}
+	}
+
+	// Write whole bytes
+	while(bf.length / 8 > 0) {
+		putc((unsigned char)bf.bits, bff->file);
+		bf.bits <<= CHAR_BIT;
+		bf.length -= CHAR_BIT;
+	}
+
+	// Store remaining bits in buffer
+	if(bf.length > 0) {
+		bff->buffer = bf.bits;
+		bff->bufferLength = bf.length;
+	}
+}
+
 // Walks preorder in the tree structure, builds up structure bits of the tree
 // and writes data to file as per specification
 void populateTreeStructure(FreqTree *tree, unsigned char **treeStructure, unsigned char *offset, FILE *file) {
@@ -154,7 +211,6 @@ unsigned char *makeTreeStructure(FreqTree *tree, int count, FILE *file) {
 void writeMetadataToFile(FreqTree *tree, int count, FILE *file) {
 	// Magic number
 	fputs("HZ", file);
-
 	int structureLen = count/8 + 1;
 
 	fseek(file, structureLen, SEEK_CUR);
@@ -196,13 +252,12 @@ EncMap *getEncMapFromFreqTree(FreqTree *tree) {
 	return map;
 }
 
-
 int main(int argc, char *argv[]) {
 	FreqTree *l1 = makeFreqTreeLeaf('f');
 	FreqTree *l2 = makeFreqTreeLeaf('u');
 	FreqTree *l3 = makeFreqTreeLeaf('c');
 	FreqTree *l4 = makeFreqTreeLeaf('k');
-	FreqTree *l5 = makeFreqTreeLeaf('!');
+	FreqTree *l5 = makeFreqTreeLeaf('\0');
 
 	FreqTree *n1 = makeFreqTreeNode(l3, l4);
 	FreqTree *n2 = makeFreqTreeNode(n1, l5);
@@ -214,16 +269,20 @@ int main(int argc, char *argv[]) {
 	writeMetadataToFile(n4, 9, file);
 	EncMap *map = getEncMapFromFreqTree(n4);
 
+	char a[] = "fuckffucckk";
+	
+	BitFieldFile bff;
+	makeBitFieldFile(&bff, file);
 
-	char a[] = { 'f', 'u', 'c', 'k', '!' };
 	for(int i = 0; i < sizeof(a)/sizeof(a[0]); i++) {
-		BitField *bf;
-		bf = getEntryEncMap(map, a[i]);
-		printf("bits: %ld length: %d\n", bf->bits, bf->length);
+		BitField *bf = getEntryEncMap(map, a[i]);
+		writeBitField(&bff, *bf);
+		//printf("%c: bits %ld length %d\n", a[i], bf->bits, bf->length);
 	}
+	closeBitFieldFile(&bff);
 
 	fclose(file);
 
 	cleanFreqTree(n4);
-	free(map);
+	cleanEncMap(map);
 }
