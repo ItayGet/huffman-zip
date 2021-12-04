@@ -215,6 +215,8 @@ void writeMetadataToFile(FreqTree *tree, int count, FILE *file) {
 
 	fseek(file, structureLen, SEEK_CUR);
 
+	// This function writes all data at leaves and per specification the
+	// data comes after tree structure so we seek before the function
 	unsigned char *treeStructure = makeTreeStructure(tree, count, file);
 
 	// Go back and write the missing bytes
