@@ -114,33 +114,6 @@ BitField *getEntryEncMap(EncMap *map, char key) {
 	return NULL;
 }
 
-void AddBitFieldToEncMap(FreqTree *tree, EncMap *map, BitField bf) {
-	if(isLeaf(tree)) {
-		insertEntryEncMap(map, tree->data, &bf);
-		return;
-	}
-
-	AppendBitBitField(&bf, false);
-	AddBitFieldToEncMap(tree->lhs, map, bf);
-	bf.bits += 1 << (bf.length - 1);
-	AddBitFieldToEncMap(tree->rhs, map, bf);
-}
-
-// Takes a tree and uses a hash map in order for a lookup of a byte to its
-// encoded forms to be linear on average
-EncMap *getEncMapFromFreqTree(FreqTree *tree) {
-	EncMap *map = malloc(sizeof(EncMap));
-	makeSymbolTable(map);
-
-	BitField bf;
-	bf.bits = 0;
-	bf.length = 0;
-
-	AddBitFieldToEncMap(tree, map, bf);
-
-	return map;
-}
-
 // Walks preorder in the tree structure, builds up structure bits of the tree
 // and writes data to file as per specification
 void populateTreeStructure(FreqTree *tree, unsigned char **treeStructure, unsigned char *offset, FILE *file) {
@@ -195,6 +168,34 @@ void writeMetadataToFile(FreqTree *tree, int count, FILE *file) {
 
 	free(treeStructure);
 }
+
+void AddBitFieldToEncMap(FreqTree *tree, EncMap *map, BitField bf) {
+	if(isLeaf(tree)) {
+		insertEntryEncMap(map, tree->data, &bf);
+		return;
+	}
+
+	AppendBitBitField(&bf, false);
+	AddBitFieldToEncMap(tree->lhs, map, bf);
+	bf.bits += 1 << (bf.length - 1);
+	AddBitFieldToEncMap(tree->rhs, map, bf);
+}
+
+// Converts a tree into a hash map in order for a lookup of a byte to its
+// encoded forms to be linear on average
+EncMap *getEncMapFromFreqTree(FreqTree *tree) {
+	EncMap *map = malloc(sizeof(EncMap));
+	makeSymbolTable(map);
+
+	BitField bf;
+	bf.bits = 0;
+	bf.length = 0;
+
+	AddBitFieldToEncMap(tree, map, bf);
+
+	return map;
+}
+
 
 int main(int argc, char *argv[]) {
 	FreqTree *l1 = makeFreqTreeLeaf('f');
