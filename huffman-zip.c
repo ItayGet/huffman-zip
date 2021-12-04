@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <limits.h>
+#include <assert.h>
 
 // The tree is used to build the internal frequency tree in a huffman encoding
 // An internal node does not have data so if lhs is not null accessing data is
@@ -48,6 +50,12 @@ typedef struct {
 
 	unsigned long int bits;
 } BitField;
+
+void AppendBitBitField(BitField *bf, bool bit) {
+	assert(bf->bits < ULONG_MAX);
+
+	bf->bits += bit << bf->length++;
+}
 
 #define BUCKETS 8
 
@@ -104,6 +112,33 @@ BitField *getEntryEncMap(EncMap *map, char key) {
 	}
 
 	return NULL;
+}
+
+void AddBitFieldToEncMap(FreqTree *tree, EncMap *map, BitField bf) {
+	if(isLeaf(tree)) {
+		insertEntryEncMap(map, tree->data, &bf);
+		return;
+	}
+
+	AppendBitBitField(&bf, false);
+	AddBitFieldToEncMap(tree->lhs, map, bf);
+	bf.bits += 1 << (bf.length - 1);
+	AddBitFieldToEncMap(tree->rhs, map, bf);
+}
+
+// Takes a tree and uses a hash map in order for a lookup of a byte to its
+// encoded forms to be linear on average
+EncMap *getEncMapFromFreqTree(FreqTree *tree) {
+	EncMap *map = malloc(sizeof(EncMap));
+	makeSymbolTable(map);
+
+	BitField bf;
+	bf.bits = 0;
+	bf.length = 0;
+
+	AddBitFieldToEncMap(tree, map, bf);
+
+	return map;
 }
 
 // Walks preorder in the tree structure, builds up structure bits of the tree
@@ -176,8 +211,18 @@ int main(int argc, char *argv[]) {
 	FILE *file = fopen("a.hz", "w");
 	
 	writeMetadataToFile(n4, 9, file);
+	EncMap *map = getEncMapFromFreqTree(n4);
+
+
+	char a[] = { 'f', 'u', 'c', 'k', '!' };
+	for(int i = 0; i < sizeof(a)/sizeof(a[0]); i++) {
+		BitField *bf;
+		bf = getEntryEncMap(map, a[i]);
+		printf("bits: %ld length: %d\n", bf->bits, bf->length);
+	}
 
 	fclose(file);
 
 	cleanFreqTree(n4);
+	free(map);
 }
