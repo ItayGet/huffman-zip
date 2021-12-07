@@ -171,6 +171,30 @@ void writeBitField(BitFieldFile *bff, BitField bf) {
 	}
 }
 
+// A struct that allows to read a single bit off files efficiently using a
+// buffer
+typedef struct {
+	unsigned char buffer;
+
+	unsigned char bufferBit;
+
+	FILE *file;
+} BitFile;
+
+void makeBitFile(BitFile *bf, FILE *file) {
+	bf->bufferBit = CHAR_BIT;
+
+	bf->file = file;
+}
+
+bool readBit(BitFile *bf) {
+	if(bf->bufferBit == CHAR_BIT) {
+		bf->bufferBit = 0;
+		bf->buffer = getc(bf->file);
+	}
+	return bf->buffer & (1 << ++bf->bufferBit);
+}
+
 // Walks preorder in the tree structure, builds up structure bits of the tree
 // and writes data to file as per specification
 void populateTreeStructure(FreqTree *tree, unsigned char **treeStructure, unsigned char *offset, FILE *file) {
