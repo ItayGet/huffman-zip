@@ -285,6 +285,21 @@ EncMap *getEncMapFromFreqTree(FreqTree *tree) {
 	return map;
 }
 
+FreqTree *buildTreeFromFile(BitFile *bf, FILE *dataFile) {
+	FreqTree *node = malloc(sizeof(FreqTree));
+	if(readBit(bf)) {
+		node->lhs = buildTreeFromFile(bf, dataFile);
+		node->rhs = buildTreeFromFile(bf, dataFile);
+
+		return node;
+	}
+
+	node->lhs = NULL;
+	node->data = getc(dataFile);
+
+	return node;
+}
+
 int main(int argc, char *argv[]) {
 	FreqTree *l1 = makeFreqTreeLeaf('f');
 	FreqTree *l2 = makeFreqTreeLeaf('u');
