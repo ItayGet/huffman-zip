@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <assert.h>
+#include <string.h>
+#include <unistd.h>
 
 // The tree is used to build the internal frequency tree in a huffman encoding
 // An internal node does not have data so if lhs is not null accessing data is
@@ -256,6 +258,26 @@ void writeMetadataToFile(FreqTree *tree, int count, FILE *file) {
 	fseek(file, pos, SEEK_SET);
 
 	free(treeStructure);
+}
+
+void decodeFile(BitFile *input, FILE *output, FreqTree *tree) {
+	FreqTree *root = tree;
+	char c;
+
+	do {
+		tree = root;
+
+		while(isLeaf(tree)) {
+			if(readBit(input)) {
+				tree = tree->lhs;
+			} else {
+				tree = tree->rhs;
+			}
+		}
+
+		c = tree->data;
+		putc(c, output);
+	} while(c != EOF);
 }
 
 void AddBitFieldToEncMap(FreqTree *tree, EncMap *map, BitField bf) {
