@@ -322,6 +322,31 @@ FreqTree *buildTreeFromFile(BitFile *bf, FILE *dataFile) {
 	return node;
 }
 
+void parseCompressedFile(FILE *input, FILE *output) {
+	char *buf, magicNumber[] = { 'H', 'Z' };
+	fread(buf, sizeof(char), 2, input);
+
+	if(memcmp(buf, magicNumber, 2)) {
+		fprintf(stderr, "File format not supported");
+		exit(1);
+	}
+
+	char treeStructureSize = getc(input);
+
+	// HACK: No standard way to duplicate file pointers
+	FILE *dataFile = fdopen(dup(fileno(input)), "r");
+
+	// Seek after tree structure to get to data
+	fseek(dataFile, treeStructureSize, SEEK_CUR);
+
+	BitFile *bf = malloc(sizeof(BitFile));
+	makeBitFile(bf, input);
+
+	FreqTree *ft = buildTreeFromFile(bf, dataFile);
+
+	// TODO: Use FreqTree to decompress data
+}
+
 int main(int argc, char *argv[]) {
 	FreqTree *l1 = makeFreqTreeLeaf('f');
 	FreqTree *l2 = makeFreqTreeLeaf('u');
