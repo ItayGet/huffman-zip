@@ -339,18 +339,27 @@ void parseCompressedFile(FILE *input, FILE *output) {
 
 	char treeStructureSize = getc(input);
 
+	long filePos = ftell(input);
+
 	// HACK: No standard way to duplicate file pointers
 	FILE *dataFile = fdopen(dup(fileno(input)), "r");
 
 	// Seek after tree structure to get to data
-	fseek(dataFile, treeStructureSize, SEEK_CUR);
+	// Use seek set because file position has to be set absolutely after
+	// duplicating
+	fseek(dataFile, filePos + treeStructureSize, SEEK_SET);
 
-	BitFile *bf = malloc(sizeof(BitFile));
-	makeBitFile(bf, input);
+	BitFile bf;
+	makeBitFile(&bf, input);
 
-	FreqTree *ft = buildTreeFromFile(bf, dataFile);
+	FreqTree *ft = buildTreeFromFile(&bf, dataFile);
 
-	// TODO: Use FreqTree to decompress data
+	// Clear any half-read bits and use the position of dataFile
+	makeBitFile(&bf, dataFile);
+
+	decodeFile(&bf, output, ft);
+
+	cleanFreqTree(ft);
 }
 
 int main(int argc, char *argv[]) {
