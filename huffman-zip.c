@@ -267,8 +267,8 @@ void decodeFile(BitFile *input, FILE *output, FreqTree *tree) {
 	do {
 		tree = root;
 
-		while(isLeaf(tree)) {
-			if(readBit(input)) {
+		while(!isLeaf(tree)) {
+			if(!readBit(input)) {
 				tree = tree->lhs;
 			} else {
 				tree = tree->rhs;
