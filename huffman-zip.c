@@ -194,7 +194,7 @@ bool readBit(BitFile *bf) {
 		bf->bufferBit = 0;
 		bf->buffer = getc(bf->file);
 	}
-	return bf->buffer & (1 << ++bf->bufferBit);
+	return bf->buffer & (1 << bf->bufferBit++);
 }
 
 // Walks preorder in the tree structure, builds up structure bits of the tree
