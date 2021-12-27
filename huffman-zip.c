@@ -192,7 +192,13 @@ void makeBitFile(BitFile *bf, FILE *file) {
 bool readBit(BitFile *bf) {
 	if(bf->bufferBit == CHAR_BIT) {
 		bf->bufferBit = 0;
-		bf->buffer = getc(bf->file);
+
+		int c = getc(bf->file);
+		if(c == EOF) {
+			fprintf(stderr, "Error in reading file: unexpected EOF");
+		}
+
+		bf->buffer = c;
 	}
 	return bf->buffer & (1 << bf->bufferBit++);
 }
@@ -277,7 +283,7 @@ void decodeFile(BitFile *input, FILE *output, FreqTree *tree) {
 
 		c = tree->data;
 		putc(c, output);
-	} while(c != EOF);
+	} while(c != '\0');
 }
 
 void AddBitFieldToEncMap(FreqTree *tree, EncMap *map, BitField bf) {
