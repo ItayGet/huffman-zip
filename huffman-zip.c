@@ -386,4 +386,10 @@ int main(int argc, char *argv[]) {
 
 	cleanFreqTree(n4);
 	cleanEncMap(map);
+
+	file = fopen("a.hz", "r");
+
+	parseCompressedFile(file, stdout);
+
+	fclose(file);
 }
