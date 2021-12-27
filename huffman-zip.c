@@ -203,6 +203,10 @@ bool readBit(BitFile *bf) {
 	return bf->buffer & (1 << bf->bufferBit++);
 }
 
+// *******************
+// * Writing to file *
+// *******************
+
 // Walks preorder in the tree structure, builds up structure bits of the tree
 // and writes data to file as per specification
 void populateTreeStructure(FreqTree *tree, unsigned char **treeStructure, unsigned char *offset, FILE *file) {
@@ -266,25 +270,9 @@ void writeMetadataToFile(FreqTree *tree, int count, FILE *file) {
 	free(treeStructure);
 }
 
-void decodeFile(BitFile *input, FILE *output, FreqTree *tree) {
-	FreqTree *root = tree;
-	char c;
-
-	do {
-		tree = root;
-
-		while(!isLeaf(tree)) {
-			if(!readBit(input)) {
-				tree = tree->lhs;
-			} else {
-				tree = tree->rhs;
-			}
-		}
-
-		c = tree->data;
-		putc(c, output);
-	} while(c != '\0');
-}
+// ******************
+// * Read from file *
+// ******************
 
 void AddBitFieldToEncMap(FreqTree *tree, EncMap *map, BitField bf) {
 	if(isLeaf(tree)) {
@@ -326,6 +314,26 @@ FreqTree *buildTreeFromFile(BitFile *bf, FILE *dataFile) {
 	node->data = getc(dataFile);
 
 	return node;
+}
+
+void decodeFile(BitFile *input, FILE *output, FreqTree *tree) {
+	FreqTree *root = tree;
+	char c;
+
+	do {
+		tree = root;
+
+		while(!isLeaf(tree)) {
+			if(!readBit(input)) {
+				tree = tree->lhs;
+			} else {
+				tree = tree->rhs;
+			}
+		}
+
+		c = tree->data;
+		putc(c, output);
+	} while(c != '\0');
 }
 
 void parseCompressedFile(FILE *input, FILE *output) {
