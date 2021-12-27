@@ -329,7 +329,7 @@ FreqTree *buildTreeFromFile(BitFile *bf, FILE *dataFile) {
 }
 
 void parseCompressedFile(FILE *input, FILE *output) {
-	char *buf, magicNumber[] = { 'H', 'Z' };
+	char buf[2], magicNumber[] = { 'H', 'Z' };
 	fread(buf, sizeof(char), 2, input);
 
 	if(memcmp(buf, magicNumber, 2)) {
