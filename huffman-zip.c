@@ -59,9 +59,9 @@ void AppendBitBitField(BitField *bf, bool bit) {
 	bf->bits += bit << bf->length++;
 }
 
-#define BUCKETS 8
+#define ENC_MAP_BUCKETS 8
 
-#define HASH(key) ((key)%BUCKETS)
+#define ENC_MAP_HASH(key) ((key)%ENC_MAP_BUCKETS)
 
 typedef struct EncMapEntry {
 	unsigned char key;
@@ -72,11 +72,11 @@ typedef struct EncMapEntry {
 // Hash map that is converted from a FreqTree in order to encode but not to
 // decode
 typedef struct {
-	EncMapEntry *entries[BUCKETS];
+	EncMapEntry *entries[ENC_MAP_BUCKETS];
 } EncMap;
 
 void makeSymbolTable(EncMap *em) {
-	for(int i = 0; i < BUCKETS; i++) {
+	for(int i = 0; i < ENC_MAP_BUCKETS; i++) {
 		em->entries[i] = NULL;
 	}
 }
@@ -89,13 +89,13 @@ void cleanEncMapEntry(EncMapEntry *eme) {
 }
 
 void cleanEncMap(EncMap *em) {
-	for(int i = 0; i < BUCKETS; i++) {
+	for(int i = 0; i < ENC_MAP_BUCKETS; i++) {
 		cleanEncMapEntry(em->entries[i]);
 	}
 }
 
 void insertEntryEncMap(EncMap *map, char key, BitField *value) {
-	int hash = HASH(key);
+	int hash = ENC_MAP_HASH(key);
 
 	EncMapEntry *newEntry = malloc(sizeof(EncMapEntry)),
 		    *prevEntry = map->entries[hash];
@@ -107,7 +107,7 @@ void insertEntryEncMap(EncMap *map, char key, BitField *value) {
 }
 
 BitField *getEntryEncMap(EncMap *map, char key) {
-	for(EncMapEntry *eme = map->entries[HASH(key)]; eme; eme = eme->next) {
+	for(EncMapEntry *eme = map->entries[ENC_MAP_HASH(key)]; eme; eme = eme->next) {
 		if(eme->key == key) {
 			return &eme->value;
 		}
