@@ -47,6 +47,16 @@ void cleanFreqTree(FreqTree *tree) {
 }
 
 typedef struct {
+	FreqTree *tree;
+	int val;
+} FreqTreeHeapNode;
+
+typedef struct {
+	FreqTreeHeapNode heap[UCHAR_MAX + 1];
+	size_t size;
+} FreqTreeHeap;
+
+typedef struct {
 	// Length in bits
 	int length;
 
