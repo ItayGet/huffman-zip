@@ -6,6 +6,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#define SIZEOF_ARR(ARR) (sizeof(ARR)/sizeof((ARR)[0]))
+
 // The tree is used to build the internal frequency tree in a huffman encoding
 // An internal node does not have data so if lhs is not null accessing data is
 // prohibited
@@ -226,6 +228,20 @@ FreqTree *buildFreqTreeFromFile(FILE *file) {
 	}
 
 	// Put into a heap, heapify and start combining and removing nodes
+	FreqTreeHeap heap;
+	for(int i = 0; i < SIZEOF_ARR(freqMap); i++) {
+		int val = freqMap[i];
+		if(val != 0) {
+			FreqTreeHeapNode *node = &heap.heap[heap.size++];
+
+			node->val = val;
+			node->tree = malloc(sizeof(FreqTree));
+			node->tree->lhs = NULL;
+			node->tree->data = i;
+		}
+	}
+
+	// Heapify
 }
 
 // Walks preorder in the tree structure, builds up structure bits of the tree
