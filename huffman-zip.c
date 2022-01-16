@@ -207,6 +207,17 @@ bool readBit(BitFile *bf) {
 // * Writing to file *
 // *******************
 
+FreqTree *buildFreqTreeFromFile(FILE *file) {
+	int freqMap[UCHAR_MAX + 1] = {0};
+
+	int c;
+	while((c = getc(file)) != EOF) {
+		freqMap[c]++;
+	}
+
+	// Put into a heap, heapify and start combining and removing nodes
+}
+
 // Walks preorder in the tree structure, builds up structure bits of the tree
 // and writes data to file as per specification
 void populateTreeStructure(FreqTree *tree, unsigned char **treeStructure, unsigned char *offset, FILE *file) {
