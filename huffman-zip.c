@@ -487,42 +487,48 @@ void parseCompressedFile(FILE *input, FILE *output) {
 }
 
 int main(int argc, char *argv[]) {
-	FreqTree *l1 = makeFreqTreeLeaf('f');
-	FreqTree *l2 = makeFreqTreeLeaf('u');
-	FreqTree *l3 = makeFreqTreeLeaf('c');
-	FreqTree *l4 = makeFreqTreeLeaf('k');
-	FreqTree *l5 = makeFreqTreeLeaf('\0');
+	//FreqTree *l1 = makeFreqTreeLeaf('f');
+	//FreqTree *l2 = makeFreqTreeLeaf('u');
+	//FreqTree *l3 = makeFreqTreeLeaf('c');
+	//FreqTree *l4 = makeFreqTreeLeaf('k');
+	//FreqTree *l5 = makeFreqTreeLeaf('\0');
 
-	FreqTree *n1 = makeFreqTreeNode(l3, l4);
-	FreqTree *n2 = makeFreqTreeNode(n1, l5);
-	FreqTree *n3 = makeFreqTreeNode(l1, l2);
-	FreqTree *n4 = makeFreqTreeNode(n3, n2);
+	//FreqTree *n1 = makeFreqTreeNode(l3, l4);
+	//FreqTree *n2 = makeFreqTreeNode(n1, l5);
+	//FreqTree *n3 = makeFreqTreeNode(l1, l2);
+	//FreqTree *n4 = makeFreqTreeNode(n3, n2);
 
-	FILE *file = fopen("a.hz", "w");
+	//FILE *file = fopen("a.hz", "w");
+	//
+	//writeMetadataToFile(n4, 9, file);
+	//EncMap *map = getEncMapFromFreqTree(n4);
+
+	//char a[] = "fuckffucckk";
+	//
+	//BitFieldFile bff;
+	//makeBitFieldFile(&bff, file);
+
+	//for(int i = 0; i < sizeof(a)/sizeof(a[0]); i++) {
+	//	BitField *bf = getEntryEncMap(map, a[i]);
+	//	writeBitField(&bff, *bf);
+	//	//printf("%c: bits %ld length %d\n", a[i], bf->bits, bf->length);
+	//}
+	//closeBitFieldFile(&bff);
+
+	//fclose(file);
+
+	//cleanFreqTree(n4);
+	//cleanEncMap(map);
+
+	//file = fopen("a.hz", "r");
+
+	//parseCompressedFile(file, stdout);
+
+	//fclose(file);
 	
-	writeMetadataToFile(n4, 9, file);
-	EncMap *map = getEncMapFromFreqTree(n4);
+	FILE *file = fopen("input.hz", "r");
 
-	char a[] = "fuckffucckk";
-	
-	BitFieldFile bff;
-	makeBitFieldFile(&bff, file);
-
-	for(int i = 0; i < sizeof(a)/sizeof(a[0]); i++) {
-		BitField *bf = getEntryEncMap(map, a[i]);
-		writeBitField(&bff, *bf);
-		//printf("%c: bits %ld length %d\n", a[i], bf->bits, bf->length);
-	}
-	closeBitFieldFile(&bff);
-
-	fclose(file);
-
-	cleanFreqTree(n4);
-	cleanEncMap(map);
-
-	file = fopen("a.hz", "r");
-
-	parseCompressedFile(file, stdout);
+	FreqTree *tree = buildFreqTreeFromFile(file);
 
 	fclose(file);
 }
