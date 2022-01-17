@@ -265,7 +265,7 @@ FreqTree *buildFreqTreeFromFile(FILE *file) {
 		freqMap[c]++;
 	}
 
-	// Put into a heap, heapify and start combining and removing nodes
+	// Put into a heap
 	FreqTreeHeap heap;
 	for(int i = 0; i < SIZEOF_ARR(freqMap); i++) {
 		int val = freqMap[i];
@@ -279,7 +279,28 @@ FreqTree *buildFreqTreeFromFile(FILE *file) {
 		}
 	}
 
-	// Heapify
+	heapify(&heap);
+
+	// Remove 2 minimum elements, combine their nodes and values and put
+	// back into the heap
+	while(heap.size > 1) {
+		FreqTreeHeapNode *minNode = &GET_INDEX_HEAP(heap, heap.size - 2);
+
+		minNode[0].val += minNode[1].val;
+		
+		FreqTree *tree = minNode[0].tree;
+
+		minNode[0].tree = malloc(sizeof(FreqTree));
+		minNode[0].tree->lhs = tree;
+		minNode[0].tree->rhs = minNode[1].tree;
+
+		heap.size--;
+
+		// TODO: swinFreqTree(&heap, heap.size - 1);
+	}
+
+	// Return the remaining tree
+	return GET_INDEX_HEAP(heap, 0).tree;
 }
 
 // Walks preorder in the tree structure, builds up structure bits of the tree
