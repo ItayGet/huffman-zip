@@ -58,6 +58,44 @@ typedef struct {
 	size_t size;
 } FreqTreeHeap;
 
+#define GET_INDEX_HEAP(treeheap, index) ((treeheap).heap[index])
+
+// Sink an index down the heap
+void sinkFreqTreeHeap(FreqTreeHeap *heap, int index) {
+	// Find index of minimum child
+
+	int minChild;
+	if (heap->size <= 2 * index - 2) {
+		// Whether index has a child
+		return;
+	}
+	else if(heap->size <= 2 * index - 1) {
+		minChild = 2 * index + 1;
+	} else {
+		// First calculate first child then add 1 if the second one is
+		// smaller
+		minChild = 2 * index + 1;
+		minChild += GET_INDEX_HEAP(*heap, 2 * index + 1).val >
+		            GET_INDEX_HEAP(*heap, 2 * index + 2).val;
+	}
+
+	if(GET_INDEX_HEAP(*heap, index).val <=
+	   GET_INDEX_HEAP(*heap, minChild).val) { return; }
+
+	// Exchange index and minChild
+	FreqTreeHeapNode tmp = GET_INDEX_HEAP(*heap, index);
+	GET_INDEX_HEAP(*heap, index) = GET_INDEX_HEAP(*heap, minChild);
+	GET_INDEX_HEAP(*heap, minChild) = tmp;
+	
+	sinkFreqTreeHeap(heap, minChild);
+}
+
+void heapify(FreqTreeHeap *heap) {
+	for(int i = heap->size/2 - 1; i > 0; i--) {
+		sinkFreqTreeHeap(heap, i);
+	}
+}
+
 typedef struct {
 	// Length in bits
 	int length;
