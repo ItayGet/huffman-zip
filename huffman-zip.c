@@ -287,6 +287,7 @@ FreqTree *buildFreqTreeFromFile(FILE *file) {
 
 	// Put into a heap
 	FreqTreeHeap heap;
+	heap.size = 0;
 	for(int i = 0; i < SIZEOF_ARR(freqMap); i++) {
 		int val = freqMap[i];
 		if(val != 0) {
