@@ -60,6 +60,26 @@ typedef struct {
 
 #define GET_INDEX_HEAP(treeheap, index) ((treeheap).heap[index])
 
+// Swin an index up the heap
+void swimFreqTreeHeap(FreqTreeHeap *heap, int index) {
+	if (index <= 1) {
+		// We have nowhere to swim to
+		return;
+	}
+
+	int parent = (index-1) / 2;
+
+	if(GET_INDEX_HEAP(*heap, index).val >=
+	   GET_INDEX_HEAP(*heap, parent).val) { return; }
+
+	// Exchange index and minChild
+	FreqTreeHeapNode tmp = GET_INDEX_HEAP(*heap, index);
+	GET_INDEX_HEAP(*heap, index) = GET_INDEX_HEAP(*heap, parent);
+	GET_INDEX_HEAP(*heap, parent) = tmp;
+	
+	swimFreqTreeHeap(heap, parent);
+}
+
 // Sink an index down the heap
 void sinkFreqTreeHeap(FreqTreeHeap *heap, int index) {
 	// Find index of minimum child
@@ -296,7 +316,7 @@ FreqTree *buildFreqTreeFromFile(FILE *file) {
 
 		heap.size--;
 
-		// TODO: swinFreqTree(&heap, heap.size - 1);
+		swimFreqTreeHeap(&heap, heap.size - 1);
 	}
 
 	// Return the remaining tree
