@@ -53,8 +53,10 @@ typedef struct {
 	int val;
 } FreqTreeHeapNode;
 
+#define HEAP_CAP (UCHAR_MAX + 1)
+
 typedef struct {
-	FreqTreeHeapNode heap[UCHAR_MAX + 1];
+	FreqTreeHeapNode heap[HEAP_CAP];
 	size_t size;
 } FreqTreeHeap;
 
