@@ -69,6 +69,7 @@ void swimFreqTreeHeap(FreqTreeHeap *heap, int index) {
 
 	int parent = (index-1) / 2;
 
+	// Specifies the heap invariant
 	if(GET_INDEX_HEAP(*heap, index).val >=
 	   GET_INDEX_HEAP(*heap, parent).val) { return; }
 
@@ -99,6 +100,7 @@ void sinkFreqTreeHeap(FreqTreeHeap *heap, int index) {
 		            GET_INDEX_HEAP(*heap, 2 * index + 2).val;
 	}
 
+	// Specifies the heap invariant
 	if(GET_INDEX_HEAP(*heap, index).val <=
 	   GET_INDEX_HEAP(*heap, minChild).val) { return; }
 
