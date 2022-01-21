@@ -62,6 +62,13 @@ typedef struct {
 
 #define GET_INDEX_HEAP(treeheap, index) ((treeheap).heap[index])
 
+#define EXCHANGE_NODES_HEAP(heap, index1, index2)\
+	do {\
+		FreqTreeHeapNode tmp = GET_INDEX_HEAP((heap), (index1));\
+		GET_INDEX_HEAP((heap), (index1)) = GET_INDEX_HEAP((heap), (index2));\
+		GET_INDEX_HEAP((heap), (index2)) = tmp;\
+	} while(0);
+
 // Swin an index up the heap
 void swimFreqTreeHeap(FreqTreeHeap *heap, int index) {
 	if (index <= 1) {
@@ -75,10 +82,7 @@ void swimFreqTreeHeap(FreqTreeHeap *heap, int index) {
 	if(GET_INDEX_HEAP(*heap, index).val >=
 	   GET_INDEX_HEAP(*heap, parent).val) { return; }
 
-	// Exchange index and minChild
-	FreqTreeHeapNode tmp = GET_INDEX_HEAP(*heap, index);
-	GET_INDEX_HEAP(*heap, index) = GET_INDEX_HEAP(*heap, parent);
-	GET_INDEX_HEAP(*heap, parent) = tmp;
+	EXCHANGE_NODES_HEAP(*heap, index, parent);
 	
 	swimFreqTreeHeap(heap, parent);
 }
@@ -106,10 +110,7 @@ void sinkFreqTreeHeap(FreqTreeHeap *heap, int index) {
 	if(GET_INDEX_HEAP(*heap, index).val <=
 	   GET_INDEX_HEAP(*heap, minChild).val) { return; }
 
-	// Exchange index and minChild
-	FreqTreeHeapNode tmp = GET_INDEX_HEAP(*heap, index);
-	GET_INDEX_HEAP(*heap, index) = GET_INDEX_HEAP(*heap, minChild);
-	GET_INDEX_HEAP(*heap, minChild) = tmp;
+	EXCHANGE_NODES_HEAP(*heap, index, minChild);
 	
 	sinkFreqTreeHeap(heap, minChild);
 }
