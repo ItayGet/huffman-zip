@@ -135,6 +135,8 @@ void dequeueFreqTreeHeap(FreqTreeHeap *heap, FreqTreeHeapNode *node) {
 
 	GET_INDEX_HEAP(*heap, 0) = GET_INDEX_HEAP(*heap, heap->size - 1);
 
+	heap->size--;
+
 	sinkFreqTreeHeap(heap, 0);
 }
 
