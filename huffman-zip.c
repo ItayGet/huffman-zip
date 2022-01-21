@@ -121,6 +121,23 @@ void heapify(FreqTreeHeap *heap) {
 	}
 }
 
+void enqueueFreqTreeHeap(FreqTreeHeap *heap, FreqTreeHeapNode *node) {
+	assert(heap->size + 1 < HEAP_CAP);
+
+	GET_INDEX_HEAP(*heap, heap->size) = *node;
+	heap->size++;
+
+	swimFreqTreeHeap(heap, heap->size - 1);
+}
+
+void dequeueFreqTreeHeap(FreqTreeHeap *heap, FreqTreeHeapNode *node) {
+	*node = GET_INDEX_HEAP(*heap, 0);
+
+	GET_INDEX_HEAP(*heap, 0) = GET_INDEX_HEAP(*heap, heap->size - 1);
+
+	sinkFreqTreeHeap(heap, 0);
+}
+
 typedef struct {
 	// Length in bits
 	int length;
