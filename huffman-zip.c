@@ -91,22 +91,21 @@ void swimFreqTreeHeap(FreqTreeHeap *heap, int index) {
 void sinkFreqTreeHeap(FreqTreeHeap *heap, int index) {
 	// Find index of minimum child
 
-	int minChild;
-	if (heap->size <= 2 * index - 2) {
-		// Whether index has a child
+	// Index has no child
+	if (index >= heap->size / 2) {
 		return;
 	}
-	else if(heap->size <= 2 * index - 1) {
-		minChild = 2 * index + 1;
-	} else {
-		// First calculate first child then add 1 if the second one is
-		// smaller
-		minChild = 2 * index + 1;
+	
+	int minChild = 2 * index + 1;
+	// Make sure second child exists by checking minChild isn't the index
+	// of the last item in the heap
+	if(minChild != heap->size - 1) {
+		// add 1 if the second child is smaller
 		minChild += GET_INDEX_HEAP(*heap, 2 * index + 1).val >
-		            GET_INDEX_HEAP(*heap, 2 * index + 2).val;
+			    GET_INDEX_HEAP(*heap, 2 * index + 2).val;
 	}
 
-	// Specifies the heap invariant
+	// Nothing left to do if the heap invariant is specified
 	if(GET_INDEX_HEAP(*heap, index).val <=
 	   GET_INDEX_HEAP(*heap, minChild).val) { return; }
 
