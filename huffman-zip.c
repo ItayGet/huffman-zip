@@ -329,19 +329,20 @@ FreqTree *buildFreqTreeFromFile(FILE *file) {
 	// Remove 2 minimum elements, combine their nodes and values and put
 	// back into the heap
 	while(heap.size > 1) {
-		FreqTreeHeapNode *minNode = &GET_INDEX_HEAP(heap, heap.size - 2);
+		FreqTreeHeapNode node1;
+		dequeueFreqTreeHeap(&heap, &node1);
 
-		minNode[0].val += minNode[1].val;
-		
-		FreqTree *tree = minNode[0].tree;
+		FreqTreeHeapNode *node2 = &GET_INDEX_HEAP(heap, 0);
 
-		minNode[0].tree = malloc(sizeof(FreqTree));
-		minNode[0].tree->lhs = tree;
-		minNode[0].tree->rhs = minNode[1].tree;
+		// Combine the first node into the first index in the heap
+		FreqTree *lhs = node2->tree;
+		node2->tree = malloc(sizeof(FreqTree));
+		node2->tree->lhs = lhs;
+		node2->tree->rhs = node1.tree;
+		node2->val += node1.val;
 
-		heap.size--;
-
-		swimFreqTreeHeap(&heap, heap.size - 1);
+		// Keep the heap invariant 
+		sinkFreqTreeHeap(&heap, 0);
 	}
 
 	// Return the remaining tree
