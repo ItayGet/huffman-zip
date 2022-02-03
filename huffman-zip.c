@@ -300,7 +300,7 @@ bool readBit(BitFile *bf) {
 // * Encode file *
 // *******************
 
-FreqTree *buildFreqTreeFromFile(FILE *file) {
+FreqTree *buildFreqTreeFromRawFile(FILE *file) {
 	int freqMap[UCHAR_MAX + 1] = {0};
 
 	int c;
@@ -442,11 +442,11 @@ EncMap *getEncMapFromFreqTree(FreqTree *tree) {
 	return map;
 }
 
-FreqTree *buildTreeFromFile(BitFile *bf, FILE *dataFile) {
+FreqTree *buildFreqTreeFromEncodedFile(BitFile *bf, FILE *dataFile) {
 	FreqTree *node = malloc(sizeof(FreqTree));
 	if(readBit(bf)) {
-		node->lhs = buildTreeFromFile(bf, dataFile);
-		node->rhs = buildTreeFromFile(bf, dataFile);
+		node->lhs = buildFreqTreeFromEncodedFile(bf, dataFile);
+		node->rhs = buildFreqTreeFromEncodedFile(bf, dataFile);
 
 		return node;
 	}
@@ -501,7 +501,7 @@ void parseCompressedFile(FILE *input, FILE *output) {
 	BitFile bf;
 	makeBitFile(&bf, input);
 
-	FreqTree *ft = buildTreeFromFile(&bf, dataFile);
+	FreqTree *ft = buildFreqTreeFromEncodedFile(&bf, dataFile);
 
 	// Clear any half-read bits and use the position of dataFile
 	makeBitFile(&bf, dataFile);
@@ -553,7 +553,7 @@ int main(int argc, char *argv[]) {
 	
 	FILE *file = fopen("input.hz", "r");
 
-	FreqTree *tree = buildFreqTreeFromFile(file);
+	FreqTree *tree = buildFreqTreeFromRawFile(file);
 
 	fclose(file);
 }
