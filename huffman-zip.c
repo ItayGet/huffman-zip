@@ -297,7 +297,7 @@ bool readBit(BitFile *bf) {
 }
 
 // *******************
-// * Writing to file *
+// * Encode file *
 // *******************
 
 FreqTree *buildFreqTreeFromFile(FILE *file) {
@@ -411,9 +411,9 @@ void writeMetadataToFile(FreqTree *tree, int count, FILE *file) {
 	free(treeStructure);
 }
 
-// ******************
-// * Read from file *
-// ******************
+// ***************
+// * Decode File *
+// ***************
 
 void AddBitFieldToEncMap(FreqTree *tree, EncMap *map, BitField bf) {
 	if(isLeaf(tree)) {
