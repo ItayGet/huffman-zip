@@ -324,9 +324,10 @@ int buildFreqTreeFromRawFile(FreqTree **tree, FILE *file) {
 		}
 	}
 
-	int count = heap.size;
-
 	heapify(&heap);
+
+	// Count of nodes starts with the size of the heap
+	int count = heap.size;
 
 	// Remove 2 minimum elements, combine their nodes and values and put
 	// back into the heap
@@ -345,6 +346,9 @@ int buildFreqTreeFromRawFile(FreqTree **tree, FILE *file) {
 
 		// Keep the heap invariant 
 		sinkFreqTreeHeap(&heap, 0);
+
+		// A new node is created so count is updated
+		count++;
 	}
 
 	// Return the remaining tree
