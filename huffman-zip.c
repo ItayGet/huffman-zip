@@ -300,7 +300,8 @@ bool readBit(BitFile *bf) {
 // * Encode file *
 // *******************
 
-FreqTree *buildFreqTreeFromRawFile(FILE *file) {
+// Return value is count of nodes
+int buildFreqTreeFromRawFile(FreqTree **tree, FILE *file) {
 	int freqMap[UCHAR_MAX + 1] = {0};
 
 	int c;
@@ -322,6 +323,8 @@ FreqTree *buildFreqTreeFromRawFile(FILE *file) {
 			node->tree->data = i;
 		}
 	}
+
+	int count = heap.size;
 
 	heapify(&heap);
 
@@ -345,7 +348,9 @@ FreqTree *buildFreqTreeFromRawFile(FILE *file) {
 	}
 
 	// Return the remaining tree
-	return GET_INDEX_HEAP(heap, 0).tree;
+	*tree = GET_INDEX_HEAP(heap, 0).tree;
+
+	return count;
 }
 
 // Walks preorder in the tree structure, builds up structure bits of the tree
@@ -414,12 +419,13 @@ void writeMetadataToFile(FreqTree *tree, int count, FILE *file) {
 void EncodeFile(FILE *input, FILE *output) {
 	long curPos = ftell(input);
 
-	FreqTree *tree = buildFreqTreeFromRawFile(input);
+	FreqTree *tree;
+	int count = buildFreqTreeFromRawFile(&tree, input);
 
 	// Seek file back 
 	fseek(input, curPos, SEEK_SET);
 
-	// writeMetadataToFile(tree, count, output);
+	writeMetadataToFile(tree, count, output);
 }
 
 // ***************
