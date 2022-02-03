@@ -411,6 +411,17 @@ void writeMetadataToFile(FreqTree *tree, int count, FILE *file) {
 	free(treeStructure);
 }
 
+void EncodeFile(FILE *input, FILE *output) {
+	long curPos = ftell(input);
+
+	FreqTree *tree = buildFreqTreeFromRawFile(input);
+
+	// Seek file back 
+	fseek(input, curPos, SEEK_SET);
+
+	// writeMetadataToFile(tree, count, output);
+}
+
 // ***************
 // * Decode File *
 // ***************
