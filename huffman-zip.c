@@ -453,10 +453,27 @@ void EncodeFile(FILE *input, FILE *output) {
 	FreqTree *tree;
 	int count = buildFreqTreeFromRawFile(&tree, input);
 
+	writeMetadataToFile(tree, count, output);
+
+	// Write encoded bits into output
+
+	EncMap *map = getEncMapFromFreqTree(tree);
+
+	BitFieldFile bff;
+	makeBitFieldFile(&bff, output);
+
 	// Seek file back 
 	fseek(input, curPos, SEEK_SET);
 
-	writeMetadataToFile(tree, count, output);
+	int c;
+	while((c = getc(input)) != EOF) {
+		BitField *bf = getEntryEncMap(map, c);
+		writeBitField(&bff, *bf);
+	}
+	closeBitFieldFile(&bff);
+
+	cleanFreqTree(tree);
+	cleanEncMap(map);
 }
 
 // ***************
