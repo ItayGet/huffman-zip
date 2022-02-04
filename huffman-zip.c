@@ -146,7 +146,7 @@ typedef struct {
 	unsigned long int bits;
 } BitField;
 
-void AppendBitBitField(BitField *bf, bool bit) {
+void appendBitBitField(BitField *bf, bool bit) {
 	assert(bf->bits < ULONG_MAX);
 
 	bf->bits += bit << bf->length++;
@@ -420,16 +420,16 @@ void writeMetadataToFile(FreqTree *tree, int count, FILE *file) {
 	free(treeStructure);
 }
 
-void AddBitFieldToEncMap(FreqTree *tree, EncMap *map, BitField bf) {
+void addBitFieldToEncMap(FreqTree *tree, EncMap *map, BitField bf) {
 	if(isLeaf(tree)) {
 		insertEntryEncMap(map, tree->data, &bf);
 		return;
 	}
 
-	AppendBitBitField(&bf, false);
-	AddBitFieldToEncMap(tree->lhs, map, bf);
+	appendBitBitField(&bf, false);
+	addBitFieldToEncMap(tree->lhs, map, bf);
 	bf.bits += 1 << (bf.length - 1);
-	AddBitFieldToEncMap(tree->rhs, map, bf);
+	addBitFieldToEncMap(tree->rhs, map, bf);
 }
 
 // Converts a tree into a hash map in order for a lookup of a byte to its
@@ -442,12 +442,12 @@ EncMap *getEncMapFromFreqTree(FreqTree *tree) {
 	bf.bits = 0;
 	bf.length = 0;
 
-	AddBitFieldToEncMap(tree, map, bf);
+	addBitFieldToEncMap(tree, map, bf);
 
 	return map;
 }
 
-void EncodeFile(FILE *input, FILE *output) {
+void encodeFile(FILE *input, FILE *output) {
 	long curPos = ftell(input);
 
 	FreqTree *tree;
