@@ -550,48 +550,19 @@ void parseCompressedFile(FILE *input, FILE *output) {
 }
 
 int main(int argc, char *argv[]) {
-	//FreqTree *l1 = makeFreqTreeLeaf('f');
-	//FreqTree *l2 = makeFreqTreeLeaf('u');
-	//FreqTree *l3 = makeFreqTreeLeaf('c');
-	//FreqTree *l4 = makeFreqTreeLeaf('k');
-	//FreqTree *l5 = makeFreqTreeLeaf('\0');
+	FILE *input, *output;
+	input = fopen("input.txt", "r"),
+        output = fopen("temp.hz", "w");
 
-	//FreqTree *n1 = makeFreqTreeNode(l3, l4);
-	//FreqTree *n2 = makeFreqTreeNode(n1, l5);
-	//FreqTree *n3 = makeFreqTreeNode(l1, l2);
-	//FreqTree *n4 = makeFreqTreeNode(n3, n2);
+	encodeFile(input, output);
+	fclose(input);
+	fclose(output);
 
-	//FILE *file = fopen("a.hz", "w");
-	//
-	//writeMetadataToFile(n4, 9, file);
-	//EncMap *map = getEncMapFromFreqTree(n4);
+	input = fopen("temp.hz", "r"),
+	output = fopen("output.txt", "w");
 
-	//char a[] = "fuckffucckk";
-	//
-	//BitFieldFile bff;
-	//makeBitFieldFile(&bff, file);
+	parseCompressedFile(input, output);
 
-	//for(int i = 0; i < sizeof(a)/sizeof(a[0]); i++) {
-	//	BitField *bf = getEntryEncMap(map, a[i]);
-	//	writeBitField(&bff, *bf);
-	//	//printf("%c: bits %ld length %d\n", a[i], bf->bits, bf->length);
-	//}
-	//closeBitFieldFile(&bff);
-
-	//fclose(file);
-
-	//cleanFreqTree(n4);
-	//cleanEncMap(map);
-
-	//file = fopen("a.hz", "r");
-
-	//parseCompressedFile(file, stdout);
-
-	//fclose(file);
-	
-	FILE *file = fopen("input.hz", "r");
-
-	FreqTree *tree = buildFreqTreeFromRawFile(file);
-
-	fclose(file);
+	fclose(input);
+	fclose(output);
 }
