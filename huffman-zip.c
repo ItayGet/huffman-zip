@@ -572,7 +572,6 @@ int main(int argc, char *argv[]) {
 	output = fopen("output.txt", "w");
 
 	decodeFile(input, output);
-
 	fclose(input);
 	fclose(output);
 }
