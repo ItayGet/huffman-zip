@@ -288,7 +288,7 @@ bool readBit(BitFile *bf) {
 
 		int c = getc(bf->file);
 		if(c == EOF) {
-			fprintf(stderr, "Error in reading file: unexpected EOF");
+			fprintf(stderr, "Error in reading file: unexpected EOF\n");
 		}
 
 		bf->buffer = c;
@@ -520,7 +520,7 @@ void parseCompressedFile(FILE *input, FILE *output) {
 	fread(buf, sizeof(char), 2, input);
 
 	if(memcmp(buf, magicNumber, 2)) {
-		fprintf(stderr, "File format not supported");
+		fprintf(stderr, "File format not supported\n");
 		exit(1);
 	}
 
