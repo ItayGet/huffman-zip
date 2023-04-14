@@ -296,9 +296,9 @@ bool readBit(BitFile *bf) {
 	return bf->buffer & (1 << bf->bufferBit++);
 }
 
-// *******************
+// ***************
 // * Encode file *
-// *******************
+// ***************
 
 // Return value is count of nodes
 int buildFreqTreeFromRawFile(FreqTree **tree, FILE *file) {
