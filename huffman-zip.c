@@ -448,7 +448,7 @@ EncMap *getEncMapFromFreqTree(FreqTree *tree) {
 }
 
 void encodeFile(FILE *input, FILE *output) {
-	long curPos = ftell(input);
+	long curPosInp = ftell(input);
 
 	FreqTree *tree;
 	int count = buildFreqTreeFromRawFile(&tree, input);
@@ -463,7 +463,7 @@ void encodeFile(FILE *input, FILE *output) {
 	makeBitFieldFile(&bff, output);
 
 	// Seek file back 
-	fseek(input, curPos, SEEK_SET);
+	fseek(input, curPosInp, SEEK_SET);
 
 	int c;
 	while((c = getc(input)) != EOF) {
