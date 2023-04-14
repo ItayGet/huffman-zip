@@ -230,8 +230,13 @@ void makeBitFieldFile(BitFieldFile *bff, FILE *file) {
 	bff->file = file;
 }
 
-void closeBitFieldFile(BitFieldFile *bff) {
-	putc(bff->buffer, bff->file);
+// Returns the length of the last byte in bits
+unsigned char closeBitFieldFile(BitFieldFile *bff) {
+	if(bff->bufferLength != 0) {
+		putc(bff->buffer, bff->file);
+	}
+
+	return bff->bufferLength;
 }
 
 void writeBitField(BitFieldFile *bff, BitField bf) {
@@ -486,10 +491,8 @@ void encodeFile(FILE *input, FILE *output) {
 		BitField *bf = getEntryEncMap(map, c);
 		writeBitField(&bff, *bf);
 	}
-	closeBitFieldFile(&bff);
 
-	// TODO: lastbitFieldSize should be taken from the BitFieldFile
-	unsigned char lastbitFieldSize = 0;
+	unsigned char lastbitFieldSize = closeBitFieldFile(&bff);
 
 	long bitFieldSize = ftell(output) - bitFieldFirstPos;
 
