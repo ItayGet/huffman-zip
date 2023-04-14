@@ -465,6 +465,12 @@ void encodeFile(FILE *input, FILE *output) {
 
 	writeMetadataToFile(tree, count, output);
 
+	// Leave room for bit field size and bits of last byte
+	long bitFieldSizePos = ftell(output);
+	fseek(output, sizeof(long) + sizeof(unsigned char), SEEK_CUR);
+
+	long bitFieldFirstPos = bitFieldSizePos + sizeof(long) + sizeof(unsigned char);
+
 	// Write encoded bits into output
 
 	EncMap *map = getEncMapFromFreqTree(tree);
@@ -482,8 +488,18 @@ void encodeFile(FILE *input, FILE *output) {
 	}
 	closeBitFieldFile(&bff);
 
+	// TODO: lastbitFieldSize should be taken from the BitFieldFile
+	unsigned char lastbitFieldSize = 0;
+
+	long bitFileSize = ftell(output) - bitFieldFirstPos;
+
 	cleanFreqTree(tree);
 	cleanEncMap(map);
+
+	// Go back and write bit field size and bits of last byte
+	fseek(output, bitFieldSizePos, SEEK_SET);
+	fwrite(&bitFileSize, sizeof(long), 1, output);
+	putc(lastbitFieldSize, output);
 }
 
 // ***************
