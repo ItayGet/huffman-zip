@@ -524,11 +524,14 @@ FreqTree *buildFreqTreeFromEncodedFile(BitFile *bf, FILE *dataFile) {
 	return node;
 }
 
-void decodeFreqTree(BitFile *input, FILE *output, FreqTree *tree) {
+void decodeFreqTree(BitFile *input, FILE *output, FreqTree *tree, long dataSizeBytes, char dataSizeBitsLastByte) {
 	FreqTree *root = tree;
 	char c;
 
-	do {
+	long currBytes = 1;
+	char currBit = 1;
+
+	while((currBytes < dataSizeBytes) || (currBytes == dataSizeBytes && currBit <= dataSizeBitsLastByte)) {
 		tree = root;
 
 		while(!isLeaf(tree)) {
@@ -537,11 +540,17 @@ void decodeFreqTree(BitFile *input, FILE *output, FreqTree *tree) {
 			} else {
 				tree = tree->rhs;
 			}
+
+			currBit++;
+			if(currBit >= 8) {
+				currBytes++;
+				currBit -= 8;
+			}
 		}
 
 		c = tree->data;
 		putc(c, output);
-	} while(c != '\0');
+	}
 }
 
 void decodeFile(FILE *input, FILE *output) {
@@ -570,10 +579,14 @@ void decodeFile(FILE *input, FILE *output) {
 
 	FreqTree *ft = buildFreqTreeFromEncodedFile(&bf, dataFile);
 
+	unsigned long bitFieldSize;
+	fread(&bitFieldSize, sizeof(long), 1, dataFile);
+	unsigned char dataSizeBitsLastByte = getc(dataFile);
+
 	// Clear any half-read bits and use the position of dataFile
 	makeBitFile(&bf, dataFile);
 
-	decodeFreqTree(&bf, output, ft);
+	decodeFreqTree(&bf, output, ft, bitFieldSize, dataSizeBitsLastByte);
 
 	cleanFreqTree(ft);
 }
