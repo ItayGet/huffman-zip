@@ -152,6 +152,10 @@ void appendBitBitField(BitField *bf, bool bit) {
 	bf->bits += bit << bf->length++;
 }
 
+bool popBitBitField(BitField *bf) {
+	return bf->bits & 1 << bf->length--;
+}
+
 #define ENC_MAP_BUCKETS 8
 
 #define ENC_MAP_HASH(key) ((key)%ENC_MAP_BUCKETS)
@@ -426,10 +430,16 @@ void addBitFieldToEncMap(FreqTree *tree, EncMap *map, BitField bf) {
 		return;
 	}
 
-	appendBitBitField(&bf, false);
-	addBitFieldToEncMap(tree->lhs, map, bf);
-	bf.bits += 1 << (bf.length - 1);
-	addBitFieldToEncMap(tree->rhs, map, bf);
+	// Recurse in lhs
+ 	appendBitBitField(&bf, false);
+ 	addBitFieldToEncMap(tree->lhs, map, bf);
+
+	// Remove last bit
+	popBitBitField(&bf);
+
+	// Recurse in rhs
+	appendBitBitField(&bf, true);
+ 	addBitFieldToEncMap(tree->rhs, map, bf);
 }
 
 // Converts a tree into a hash map in order for a lookup of a byte to its
@@ -552,7 +562,7 @@ void decodeFile(FILE *input, FILE *output) {
 int main(int argc, char *argv[]) {
 	FILE *input, *output;
 	input = fopen("input.txt", "r"),
-        output = fopen("temp.hz", "w");
+	output = fopen("temp.hz", "w");
 
 	encodeFile(input, output);
 	fclose(input);
