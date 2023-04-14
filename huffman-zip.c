@@ -367,7 +367,7 @@ void populateTreeStructure(FreqTree *tree, unsigned char **treeStructure, unsign
 	}
 
 	// Check if current item is full
-	if(*offset >= 1 << 7) {
+	if(*offset >= 7) {
 		(*treeStructure)++;
 		*offset = 0;
 	} else {
@@ -382,7 +382,7 @@ void populateTreeStructure(FreqTree *tree, unsigned char **treeStructure, unsign
 
 // Prepare calling for populateTreeStructure
 unsigned char *makeTreeStructure(FreqTree *tree, int count, FILE *file) {
-	unsigned char *treeStructure = malloc(sizeof(unsigned char) * count/8);
+	unsigned char *treeStructure = malloc(sizeof(unsigned char) * count/8 + 1);
 
 	unsigned char offset = 0, *treeStructurePtr = treeStructure;
 
