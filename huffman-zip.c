@@ -495,7 +495,7 @@ FreqTree *buildFreqTreeFromEncodedFile(BitFile *bf, FILE *dataFile) {
 	return node;
 }
 
-void decodeFile(BitFile *input, FILE *output, FreqTree *tree) {
+void decodeFreqTree(BitFile *input, FILE *output, FreqTree *tree) {
 	FreqTree *root = tree;
 	char c;
 
@@ -515,7 +515,7 @@ void decodeFile(BitFile *input, FILE *output, FreqTree *tree) {
 	} while(c != '\0');
 }
 
-void parseCompressedFile(FILE *input, FILE *output) {
+void decodeFile(FILE *input, FILE *output) {
 	char buf[2], magicNumber[] = { 'H', 'Z' };
 	fread(buf, sizeof(char), 2, input);
 
@@ -544,7 +544,7 @@ void parseCompressedFile(FILE *input, FILE *output) {
 	// Clear any half-read bits and use the position of dataFile
 	makeBitFile(&bf, dataFile);
 
-	decodeFile(&bf, output, ft);
+	decodeFreqTree(&bf, output, ft);
 
 	cleanFreqTree(ft);
 }
@@ -561,7 +561,7 @@ int main(int argc, char *argv[]) {
 	input = fopen("temp.hz", "r"),
 	output = fopen("output.txt", "w");
 
-	parseCompressedFile(input, output);
+	decodeFile(input, output);
 
 	fclose(input);
 	fclose(output);
