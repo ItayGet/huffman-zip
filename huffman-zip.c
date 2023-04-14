@@ -491,14 +491,14 @@ void encodeFile(FILE *input, FILE *output) {
 	// TODO: lastbitFieldSize should be taken from the BitFieldFile
 	unsigned char lastbitFieldSize = 0;
 
-	long bitFileSize = ftell(output) - bitFieldFirstPos;
+	long bitFieldSize = ftell(output) - bitFieldFirstPos;
 
 	cleanFreqTree(tree);
 	cleanEncMap(map);
 
 	// Go back and write bit field size and bits of last byte
 	fseek(output, bitFieldSizePos, SEEK_SET);
-	fwrite(&bitFileSize, sizeof(long), 1, output);
+	fwrite(&bitFieldSize, sizeof(long), 1, output);
 	putc(lastbitFieldSize, output);
 }
 
