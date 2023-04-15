@@ -462,6 +462,8 @@ EncMap *getEncMapFromFreqTree(FreqTree *tree) {
 	return map;
 }
 
+void writeFreqTree(FreqTree *ft, FILE *file);
+void writeEncMap(EncMap *em, FILE *file);
 void encodeFile(FILE *input, FILE *output) {
 	long curPosInp = ftell(input);
 
@@ -485,6 +487,10 @@ void encodeFile(FILE *input, FILE *output) {
 
 	// Seek file back 
 	fseek(input, curPosInp, SEEK_SET);
+
+	// DEBUG FUNCTIONS
+	writeFreqTree(tree, stdout);
+	//writeEncMap(map, stdout);
 
 	int c;
 	while((c = getc(input)) != EOF) {
@@ -589,6 +595,108 @@ void decodeFile(FILE *input, FILE *output) {
 	decodeFreqTree(&bf, output, ft, bitFieldSize, dataSizeBitsLastByte);
 
 	cleanFreqTree(ft);
+}
+
+// *******************
+// * DEBUG FUNCTIONS *
+// *******************
+
+void writeFreqTreeNode(FreqTree *ft, FILE *file, char *name) {
+	if(isLeaf(ft)) {
+		char *fmtChar;
+		bool isfmtCharMalloced = false;
+		switch(ft->data) {
+		case '"':
+			fmtChar = "\\\"";
+			break;
+		case '\n':
+			fmtChar = "\\n";
+			break;
+		case ' ':
+			fmtChar = "space";
+			break;
+		case '\'':
+			fmtChar = "\\'";
+			break;
+		case '\0':
+			fmtChar = "\\\\0";
+			break;
+		default:
+			fmtChar = malloc(sizeof(char) * 2);
+			fmtChar[0] = ft->data;
+			fmtChar[1] = '\0';
+			isfmtCharMalloced = true;
+		}
+		fprintf(file, "\t\"%s\" [label=\"%s\\n%s\" shape=box]\n", name, fmtChar, name);
+
+		if(isfmtCharMalloced) {
+			free(fmtChar);
+		}
+		return;
+	}
+
+	const char *lhsC = "0";
+	const char *rhsC = "1";
+	unsigned long len = strlen(name);
+	unsigned long lenLhs = strlen(lhsC);
+	unsigned long lenRhs = strlen(rhsC);
+
+	char *lhs = malloc(sizeof(char) * (len + lenLhs + 1));
+	char *rhs = malloc(sizeof(char) * (len + lenRhs + 1));
+	
+	strcpy(lhs, lhsC);
+	strcat(lhs, name);
+
+	strcpy(rhs, rhsC);
+	strcat(rhs, name);
+
+	fprintf(file, "\t\"%s\" -> \"%s\"\n", name, lhs);
+	fprintf(file, "\t\"%s\" -> \"%s\"\n", name, rhs);
+
+	writeFreqTreeNode(ft->lhs, file, lhs);
+	writeFreqTreeNode(ft->rhs, file, rhs);
+
+	free(lhs);
+	free(rhs);
+}
+
+// Write freqTree into a file in the VizGraph Format
+void writeFreqTree(FreqTree *ft, FILE *file) {
+	fputs("digraph {\n", file);
+
+	writeFreqTreeNode(ft, file, "");
+
+	fputs("}\n", file);
+}
+
+char *stringifyBitField(BitField *bf) {
+	char *string = malloc(sizeof(char) * (bf->length + 1));
+	for(int i = 0; i < bf->length; i++) {
+		string[i] = bf->bits & 1 << i ? '1' : '0';
+	}
+
+	string[bf->length] = '\0';
+	
+	return string;
+}
+
+void writeEncMapEntry(EncMapEntry *eme, FILE *file) {
+	if(eme == NULL) { return; }
+
+	char *bitsStr = stringifyBitField(&eme->value);
+
+	fprintf(file, "%c %s\n", eme->key, bitsStr);
+	
+	free(bitsStr);
+
+	writeEncMapEntry(eme->next, file);
+}
+
+// Write the bits required to write a certain character to a file
+void writeEncMap(EncMap *em, FILE *file) {
+	for(int i = 0; i < SIZEOF_ARR(em->entries); i++) {
+		writeEncMapEntry(em->entries[i], file);
+	}
 }
 
 int main(int argc, char *argv[]) {
