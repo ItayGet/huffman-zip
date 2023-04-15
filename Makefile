@@ -24,7 +24,7 @@ $(OBJDIR):
 
 .PHONY: debug clean
 
-debug: CFLAGS += -g
+debug: CFLAGS += -g -DDEBUG_FUNCTIONS
 debug: all
 
 clean:

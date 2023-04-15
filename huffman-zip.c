@@ -462,8 +462,11 @@ EncMap *getEncMapFromFreqTree(FreqTree *tree) {
 	return map;
 }
 
+#ifdef DEBUG_FUNCTIONS
 void writeFreqTree(FreqTree *ft, FILE *file);
 void writeEncMap(EncMap *em, FILE *file);
+#endif
+
 void encodeFile(FILE *input, FILE *output) {
 	long curPosInp = ftell(input);
 
@@ -488,9 +491,10 @@ void encodeFile(FILE *input, FILE *output) {
 	// Seek file back 
 	fseek(input, curPosInp, SEEK_SET);
 
-	// DEBUG FUNCTIONS
+#ifdef DEBUG_FUNCTIONS
 	writeFreqTree(tree, stdout);
 	//writeEncMap(map, stdout);
+#endif
 
 	int c;
 	while((c = getc(input)) != EOF) {
@@ -601,6 +605,7 @@ void decodeFile(FILE *input, FILE *output) {
 // * DEBUG FUNCTIONS *
 // *******************
 
+#ifdef DEBUG_FUNCTIONS
 void writeFreqTreeNode(FreqTree *ft, FILE *file, char *name) {
 	if(isLeaf(ft)) {
 		char *fmtChar;
@@ -698,6 +703,7 @@ void writeEncMap(EncMap *em, FILE *file) {
 		writeEncMapEntry(em->entries[i], file);
 	}
 }
+#endif
 
 int main(int argc, char *argv[]) {
 	FILE *input, *output;
