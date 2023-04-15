@@ -1,1 +1,75 @@
 Name were we at hope. Remainder household direction zealously the unwilling bed sex. Lose and gay ham sake met that. Stood her place one ten spoke yet. Head case knew ever set why over. Marianne returned of peculiar replying in moderate. Roused get enable garret estate old county. Entreaties you devonshire law dissimilar terminated. 
+
+
+    Learn Microsoft C++, C, and Assembler C runtime library Function family overviews 
+
+    Format specification syntax: printf and wprintf functions
+
+        Article
+	    01/24/2023
+
+	    The various printf and wprintf functions take a format string and optional arguments and produce a formatted sequence of characters for output. The format string contains zero or more directives, which are either literal characters for output or encoded conversion specifications that describe how to format an argument in the output. This article describes the syntax used to encode conversion specifications in the format string. For a listing of these functions, see Stream I/O.
+
+	    A conversion specification consists of optional and required fields in this form:
+
+	        %[flags][width][.precision][size]type
+
+		Each field of the conversion specification is a character or a number that signifies a particular format option or conversion specifier. The required type field specifies the kind of conversion to be applied to an argument. The optional flags, width, and precision fields control other format aspects such as leading spaces or zeroes, justification, and displayed precision. The size field specifies the size of the argument consumed and converted.
+
+		A basic conversion specification contains only the percent sign and a type character. For example, %s specifies a string conversion. To print a percent-sign character, use %%. If a percent sign is followed by a character that has no meaning as a format field, the invalid parameter handler is invoked. For more information, see Parameter validation.
+
+		Important
+
+		For security and stability, ensure that format conversion specification strings aren't end-user defined. For example, consider a program that prompts the user to enter a name and stores the input in a string variable that's named user_name. To print user_name, never do this:
+
+		printf( user_name ); /* Danger! If user_name contains "%s", program will crash */
+
+		Instead, do this:
+
+		printf( "%s", user_name );
+
+		Note
+
+		In Visual Studio 2015 The printf and scanf family of functions were declared as inline and moved to the <stdio.h> and <conio.h> headers. If you are migrating older code you might see LNK2019 in connection with these functions. For more information, see Visual C++ change history 2003 - 2015.
+		Type conversion specifier
+
+		The type conversion specifier character specifies whether to interpret the corresponding argument as a character, a string, a pointer, an integer, or a floating-point number. The type character is the only required conversion specification field, and it appears after any optional fields.
+
+		The arguments that follow the format string are interpreted according to the corresponding type character and the optional size prefix. Conversions for character types char and wchar_t are specified by using c or C, and single-byte and multi-byte or wide character strings are specified by using s or S, depending on which formatting function is being used. Character and string arguments that are specified by using c and s are interpreted as char and char* by printf family functions, or as wchar_t and wchar_t* by wprintf family functions. Character and string arguments that are specified by using C and S are interpreted as wchar_t and wchar_t* by printf family functions, or as char and char* by wprintf family functions. This behavior is Microsoft-specific. For historical reasons, the wprintf functions use c and s to refer to wchar_t characters, and C and S specify narrow characters.
+
+		Integer types such as short, int, long, long long, and their unsigned variants, are specified by using d, i, o, u, x, and X. Floating-point types such as float, double, and long double, are specified by using a, A, e, E, f, F, g, and G. By default, unless they're modified by a size prefix, integer arguments are coerced to int type, and floating-point arguments are coerced to double. On 64-bit systems, an int is a 32-bit value; so, 64-bit integers will be truncated when they're formatted for output unless a size prefix of ll or I64 is used. Pointer types that are specified by p use the default pointer size for the platform.
+
+		Note
+
+		Microsoft-specific:
+		The Z type character, and the behavior of the c, C, s, and S type characters when they're used with the printf and wprintf functions, are Microsoft extensions. The ISO C standard uses c and s consistently for narrow characters and strings, and C and S for wide characters and strings, in all formatting functions.
+		Type field characters
+		Type character 	Argument 	Output format
+		c 	Character 	When used with printf functions, specifies a single-byte character; when used with wprintf functions, specifies a wide character.
+		C 	Character 	When used with printf functions, specifies a wide character; when used with wprintf functions, specifies a single-byte character.
+		d 	Integer 	Signed decimal integer.
+		i 	Integer 	Signed decimal integer.
+		o 	Integer 	Unsigned octal integer.
+		u 	Integer 	Unsigned decimal integer.
+		x 	Integer 	Unsigned hexadecimal integer; uses "abcdef".
+		X 	Integer 	Unsigned hexadecimal integer; uses "ABCDEF".
+		e 	Floating-point 	Signed value that has the form [-]d.dddde[+|-]dd[d], where d is one decimal digit, dddd is one or more decimal digits depending on the specified precision, or six by default, and dd[d] is two or three decimal digits depending on the output format and size of the exponent.
+		E 	Floating-point 	Identical to the e format except that E rather than e introduces the exponent.
+		f 	Floating-point 	Signed value that has the form [-]dddd.dddd, where dddd is one or more decimal digits. The number of digits before the decimal point depends on the magnitude of the number, and the number of digits after the decimal point depends on the requested precision, or six by default.
+		F 	Floating-point 	Identical to the f format except that infinity and NaN output is capitalized.
+		g 	Floating-point 	Signed values are displayed in f or e format, whichever is more compact for the given value and precision. The e format is used only when the exponent of the value is less than -4 or greater than or equal to the precision argument. Trailing zeros are truncated, and the decimal point appears only if one or more digits follow it.
+		G 	Floating-point 	Identical to the g format, except that E, rather than e, introduces the exponent (where appropriate).
+		a 	Floating-point 	Signed hexadecimal double-precision floating-point value that has the form [-]0xh.hhhhp[+|-]dd, where h.hhhh are the hex digits (using lower case letters) of the mantissa, and dd are one or more digits for the exponent. The precision specifies the number of digits after the point.
+		A 	Floating-point 	Signed hexadecimal double-precision floating-point value that has the form [-]0Xh.hhhhP[+|-]dd, where h.hhhh are the hex digits (using capital letters) of the mantissa, and dd are one or more digits for the exponent. The precision specifies the number of digits after the point.
+		n 	Pointer to integer 	Number of characters that are successfully written so far to the stream or buffer. This value is stored in the integer whose address is given as the argument. The size of the integer pointed at can be controlled by an argument size specification prefix. The n specifier is disabled by default; for information see the important security note.
+		p 	Pointer type 	Display the argument as an address in hexadecimal digits.
+		s 	String 	When used with printf functions, specifies a single-byte or multi-byte character string; when used with wprintf functions, specifies a wide-character string. Characters are displayed up to the first null character or until the precision value is reached.
+		S 	String 	When used with printf functions, specifies a wide-character string; when used with wprintf functions, specifies a single-byte or multi-byte character string. Characters are displayed up to the first null character or until the precision value is reached.
+		Z 	ANSI_STRING or UNICODE_STRING structure 	VS 2013 and earlier
+		When the address of an ANSI_STRING or UNICODE_STRING structure is passed as the argument, display the string contained in the buffer pointed to by the Buffer field of the structure. Use a size modifier prefix of w to specify a UNICODE_STRING argument—for example, %wZ. The Length field of the structure must be set to the length, in bytes, of the string. The MaximumLength field of the structure must be set to the length, in bytes, of the buffer.
+
+		Universal C Runtime (UCRT)
+		There is a known issue in the UCRT that is currently maintained for compatibility. Like the S specifier, the Z specifier without a size modifier prefix refers to a UNICODE_STRING when using a narrow printing function (like printf) and an ANSI_STRING when using a wide printing function (like wprintf).
+		Instead of Z, use hZ to specify an ANSI_STRING. wZ (or lZ) can still be used to specify a UNICODE_STRING.
+
+		Typically, the Z type character is used only in driver debugging functions that use a conversion specification, such as dbgPrint and kdPrint.
