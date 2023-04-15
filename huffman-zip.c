@@ -264,7 +264,7 @@ void writeBitField(BitFieldFile *bff, BitField bf) {
 	// Write whole bytes
 	while(bf.length / 8 > 0) {
 		putc((unsigned char)bf.bits, bff->file);
-		bf.bits <<= CHAR_BIT;
+		bf.bits >>= CHAR_BIT;
 		bf.length -= CHAR_BIT;
 	}
 
