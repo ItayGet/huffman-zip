@@ -17,13 +17,13 @@ typedef struct FreqTree {
 
 	union {
 		struct FreqTree *rhs;
-		char data;
+		unsigned char data;
 	};
 } FreqTree;
 
 #define isLeaf(t) ((t)->lhs==NULL)
 
-FreqTree *makeFreqTreeLeaf(char data) {
+FreqTree *makeFreqTreeLeaf(unsigned char data) {
 	FreqTree *node = malloc(sizeof(FreqTree));
 	node->lhs = NULL;
 	node->data = data;
@@ -191,7 +191,7 @@ void cleanEncMap(EncMap *em) {
 	}
 }
 
-void insertEntryEncMap(EncMap *map, char key, BitField *value) {
+void insertEntryEncMap(EncMap *map, unsigned char key, BitField *value) {
 	int hash = ENC_MAP_HASH(key);
 
 	EncMapEntry *newEntry = malloc(sizeof(EncMapEntry)),
@@ -203,7 +203,7 @@ void insertEntryEncMap(EncMap *map, char key, BitField *value) {
 	newEntry->value = *value;
 }
 
-BitField *getEntryEncMap(EncMap *map, char key) {
+BitField *getEntryEncMap(EncMap *map, unsigned char key) {
 	for(EncMapEntry *eme = map->entries[ENC_MAP_HASH(key)]; eme; eme = eme->next) {
 		if(eme->key == key) {
 			return &eme->value;
