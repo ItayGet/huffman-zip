@@ -2,5 +2,3 @@ huffman-zip
 *.o
 obj
 .ccls
-output.txt
-temp.hz
