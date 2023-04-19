@@ -297,7 +297,7 @@ bool readBit(BitFile *bf) {
 
 		int c = getc(bf->file);
 		if(c == EOF) {
-			fprintf(stderr, "Error in reading file: unexpected EOF\n");
+			fprintf(stderr, "reading file: unexpected EOF\n");
 		}
 
 		bf->buffer = c;
@@ -705,19 +705,67 @@ void writeEncMap(EncMap *em, FILE *file) {
 }
 #endif
 
+FILE *openFileCmd(char *filename, bool isInput) {
+	if(!strcmp(filename, "-")) {
+		return isInput ? stdin : stdout;
+	}
+
+	FILE *file = fopen(filename, isInput ? "r" : "w");
+	if(file == NULL) {
+		fprintf(stderr, "Unable to open file %s\n", filename);
+		exit(-1);
+	}
+
+	return file;
+}
+
+void usage(char *argv0) {
+	printf("Usage: %s <subcommand>", argv0);
+	puts("Subcommands:");
+	puts("\te[ncode] <input> <output>");
+	puts("\td[ecode] <input> <output>");
+	puts("\thelp\tshows this help menu");
+	puts("");
+	puts("whenever there is an <input>/<output> \"-\" can be used to mean stdin/stdout");
+}
+
 int main(int argc, char *argv[]) {
-	FILE *input, *output;
-	input = fopen("input.txt", "r"),
-	output = fopen("temp.hz", "w");
+	if(argc < 2) {
+		fprintf(stderr, "Not enough arguments\n");
+		usage(argv[0]);
+		exit(-1);
+	}
 
-	encodeFile(input, output);
-	fclose(input);
-	fclose(output);
+	if(!strcmp(argv[1], "e") ||
+	   !strcmp(argv[1], "encode")) {
+		if(argc < 4) {
+			fprintf(stderr, "Encoding file needs at least 2 files. see help subcommand\n");
+			exit(-1);
+		}
 
-	input = fopen("temp.hz", "r"),
-	output = fopen("output.txt", "w");
+		FILE *input = openFileCmd(argv[2], true);
+		FILE *output = openFileCmd(argv[3], false);
 
-	decodeFile(input, output);
-	fclose(input);
-	fclose(output);
+		encodeFile(input, output);
+
+	} else if(!strcmp(argv[1], "d") ||
+	          !strcmp(argv[1], "decode")) {
+		if(argc < 4) {
+			fprintf(stderr, "Decoding file needs at least 2 files. see help subcommand\n");
+			exit(-1);
+		}
+
+		FILE *input = openFileCmd(argv[2], true);
+		FILE *output = openFileCmd(argv[3], false);
+
+		decodeFile(input, output);
+
+	} else if(!strcmp(argv[1], "h") ||
+	          !strcmp(argv[1], "help")) {
+		usage(argv[0]);
+	} else {
+		fprintf(stderr, "Not a subcommand\n");
+		usage(argv[0]);
+		exit(-1);
+	}
 }
