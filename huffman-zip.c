@@ -706,8 +706,8 @@ void writeEncMap(EncMap *em, FILE *file) {
 #endif
 
 FILE *openFileCmd(char *filename, bool isInput) {
-	if(!strcmp(filename, "-")) {
-		return isInput ? stdin : stdout;
+	if(!isInput && !strcmp(filename, "-")) {
+		return stdout;
 	}
 
 	FILE *file = fopen(filename, isInput ? "r" : "w");
@@ -726,7 +726,7 @@ void usage(char *argv0) {
 	puts("\td[ecode] <input> <output>");
 	puts("\thelp\tshows this help menu");
 	puts("");
-	puts("whenever there is an <input>/<output> \"-\" can be used to mean stdin/stdout");
+	puts("whenever there is an <output> \"-\" can be used to mean stdin/stdout");
 }
 
 int main(int argc, char *argv[]) {
