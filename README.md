@@ -1,5 +1,5 @@
 # Huffman zip
-Compress files using Huffman Encoding and store them for later extraction
+Compress files using Huffman Encoding and store them for later extraction.
 
 # Usage
 Taken directly from usage page
@@ -13,8 +13,8 @@ Subcommands:
 whenever there is an <output> \"-\" can be used to mean stdin/stdout
 
 # Building
-Building the project is using the Makefile provided
-These are the recipes that could be used
+Building the project is using the Makefile provided.
+These are the recipes that could be used.
 - all: Build project without debug symbols
 - debug: Build project with debug symbols
 - debug-funcs: Build project with debug symbols and output debug information
@@ -23,4 +23,5 @@ These are the recipes that could be used
 
 # Encoded file strcuture
 The encoded files have a unique file structure:
-TODO
+
+###TODO###
