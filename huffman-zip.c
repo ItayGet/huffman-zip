@@ -333,6 +333,20 @@ int buildFreqTreeFromRawFile(FreqTree **tree, FILE *file) {
 		}
 	}
 
+	// If heap size is exactly 1 the resulting tree gives a single data
+	// node that in which the encoding for the letter will be with 0 bits
+	if(heap.size == 1) {
+		heap.size++;
+
+		FreqTreeHeapNode *firstNode = &heap.heap[0];
+		FreqTreeHeapNode *node = &heap.heap[1];
+
+		node->val = 0;
+		node->tree = malloc(sizeof(FreqTree));
+		node->tree->lhs = NULL;
+		node->tree->data = firstNode->tree->data == '\0' ? '\1' : '\0';
+	}
+
 	heapify(&heap);
 
 	// Count of nodes starts with the size of the heap
