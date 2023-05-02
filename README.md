@@ -3,7 +3,7 @@ Compress files using Huffman Encoding and store them for later extraction.
 
 # Usage
 Taken directly from usage page
-
+```
 Usage: huffman-zip <subcommand>
 Subcommands:
     e[ncode] <input> <output>
@@ -11,6 +11,7 @@ Subcommands:
     help\tshows this help menu
 
 whenever there is an <output> \"-\" can be used to mean stdin/stdout
+```
 
 # Building
 Building the project is using the Makefile provided.
