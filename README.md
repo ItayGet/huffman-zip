@@ -10,7 +10,7 @@ Subcommands:
     d[ecode] <input> <output>
     help shows this help menu
 
-whenever there is an <output> "-" can be used to mean stdin/stdout
+Whenever there is an <output> "-" can be used to mean stdin/stdout
 ```
 
 # Building

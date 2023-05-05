@@ -740,7 +740,7 @@ void usage(char *argv0) {
 	puts("\td[ecode] <input> <output>");
 	puts("\thelp shows this help menu");
 	puts("");
-	puts("whenever there is an <output> \"-\" can be used to mean stdin/stdout");
+	puts("Whenever there is an <output> \"-\" can be used to mean stdin/stdout");
 }
 
 int main(int argc, char *argv[]) {
