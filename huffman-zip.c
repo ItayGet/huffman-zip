@@ -738,7 +738,7 @@ void usage(char *argv0) {
 	puts("Subcommands:");
 	puts("\te[ncode] <input> <output>");
 	puts("\td[ecode] <input> <output>");
-	puts("\thelp\tshows this help menu");
+	puts("\thelp shows this help menu");
 	puts("");
 	puts("whenever there is an <output> \"-\" can be used to mean stdin/stdout");
 }

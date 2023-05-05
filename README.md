@@ -8,9 +8,9 @@ Usage: huffman-zip <subcommand>
 Subcommands:
     e[ncode] <input> <output>
     d[ecode] <input> <output>
-    help\tshows this help menu
+    help shows this help menu
 
-whenever there is an <output> \"-\" can be used to mean stdin/stdout
+whenever there is an <output> "-" can be used to mean stdin/stdout
 ```
 
 # Building
